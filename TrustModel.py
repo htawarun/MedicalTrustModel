@@ -102,11 +102,16 @@ for run_number in range(1, total_runs+1):
     os.mkdir("Run" + str(run_number))
     
     ## Open files for writing
+    TimeSteps = open("Run"+str(run_number)+"/TimeSteps.csv","w")
     RetailerPrices = open("Run" + str(run_number) + "/RetailerPrices.csv","w")
-    RetailerQualities = open("Run" + str(run_number) + "/Qualities.csv","w")
+    RetailerQualities = open("Run" + str(run_number) + "/RetailerQualities.csv","w")
+    RetailerInventories = open("Run" + str(run_number) + "/RetailerInventories.csv","w")
     SupplierPrices = open("Run" + str(run_number) + "/SupplierPrices.csv","w")
     SupplierQualities = open("Run" + str(run_number) + "/SupplierQualities.csv","w")
-    
+    SupplierInventories = open("Run" + str(run_number) + "/SupplierInventories.csv","w")
+    TrustInRetailers = open("Run" + str(run_number) + "/TrustInRetailers.csv","w")
+    if gossip_mode == "f":
+        RetailerGossipTrust = open("Run" + str(run_number) + "GossipTrust/.csv","w")
     
     ## Initialise values
     
@@ -136,27 +141,39 @@ for run_number in range(1, total_runs+1):
             clockwise_separation = standard_distance*abs(i-j*number_patients/number_retailers)
             anticlockwise_separation = standard_distance*abs(number_patients - i + j*number_patients/number_retailers)
             patient_retailer_distance[i,j] = min(clockwise_separation, anticlockwise_separation)
+    
+    # supplier and retailer bankruptcy counters
+    suppliers_bankrupt = 0
+    retailers_bankrupt = 0
             
     ## Write initial values into output files
     for retailer in range(0,number_retailers):
-        RetailerPrices.write(str(retailer_price[retailer]) + ",")
-        RetailerQualities.write(str(retailer_quality[retailer])+",")
+        RetailerPrices.write(str(float(retailer_price[retailer])) + ",")
+        RetailerQualities.write(str(float(retailer_quality[retailer]))+",")
+        RetailerInventories.write(str(int(retailer_inventory[retailer]))+ ",")
+        TrustInRetailers.write(str(float(np.mean(patient_retailer_trust[:,retailer]))) + ",")
+        if gossip_mode == "f":
+            RetailerGossipTrust.write(str(float(np.mean(gossip_trust[:,retailer]))) + ",")
     RetailerPrices.write("\n")
     RetailerQualities.write("\n")
+    RetailerInventories.write("\n")
+    TrustInRetailers.write("\n")
+    if gossip_mode == "f":
+        RetailerGossipTrust.write("\n")
     
     for supplier in range(0, number_suppliers):
         SupplierPrices.write(str(supplier_price[supplier]) + ",")
         SupplierQualities.write(str(supplier_quality[supplier]) +",")
+        SupplierInventories.write(str(int(supplier_inventory[supplier]))+ ",")
+
     SupplierPrices.write("\n")
     SupplierQualities.write("\n")
+    SupplierInventories.write("\n")
+    
     
     
     ## Start time loop
     for step_number in range(1, total_steps+1):
-        
-        # give percentage of this run's completion every 10%
-        if step_number%(total_steps/10.0) == 0:
-            print(str(systime.strftime("%H:%M:%S") + " - " + str(int(step_number*100/total_steps)) + "% of run " + str(run_number) + " of " + str(total_runs) +" complete"))
 
         
         # shuffle patient and retailer lists
@@ -173,7 +190,9 @@ for run_number in range(1, total_runs+1):
         # iterate over all patients
         for patient in patient_list:
             
-            retailer_values = np.zeros(number_retailers)
+            # create array with retailer indices and values
+            retailer_values = np.zeros((number_retailers,2))
+            retailer_values[:,0] = np.array(range(0, number_retailers))
             
             if gossip_mode == "f":
                 
@@ -197,36 +216,38 @@ for run_number in range(1, total_runs+1):
                     gossip_trust[patient, retailer] = average_trust
                     
                     # calculate retailer values
-                    retailer_values[retailer] = -retailer_price[retailer] - patient_retailer_distance[patient,retailer] + trust_weight*patient_retailer_trust[patient,retailer] + gossip_weight*gossip_trust[patient, retailer]
+                    retailer_values[retailer,1] = -retailer_price[retailer] - patient_retailer_distance[patient,retailer] + trust_weight*patient_retailer_trust[patient,retailer] + gossip_weight*gossip_trust[patient, retailer]
                     
             elif gossip_mode == "p":
                 
                 for retailer in range(0,number_retailers):
                     
                     # calculate retailer values
-                    retailer_values[retailer] = -retailer_price[retailer] - patient_retailer_distance[patient,retailer] + trust_weight*patient_retailer_trust[patient, retailer] + gossip_weight*gossip_trust[retailer]
+                    retailer_values[retailer,1] = -retailer_price[retailer] - patient_retailer_distance[patient,retailer] + trust_weight*patient_retailer_trust[patient, retailer] + gossip_weight*gossip_trust[retailer]
                     
             else:
                 
                 for retailer in range(0, number_retailers):
                     
                     # calculate retailer values
-                    retailer_values[retailer] = -retailer_price[retailer] - patient_retailer_distance[retailer] + trust_weight*patient_retailer_trust[patient, retailer]
+                    retailer_values[retailer,1] = -retailer_price[retailer] - patient_retailer_distance[patient,retailer] + trust_weight*patient_retailer_trust[patient, retailer]
                 
             # find preferred retailer
-            chosen_retailer = np.argmax(retailer_values)
+            chosen_retailer_row = np.argmax(retailer_values[:,1])
+            chosen_retailer = int(retailer_values[chosen_retailer_row,0])
+
             
             StockLeft = True
             
             # if no inventory, go to next best retailer
             while retailer_inventory[chosen_retailer] < 1:
-                retailer_values = np.delete(retailer_values, chosen_retailer)
+                retailer_values = np.delete(retailer_values, chosen_retailer_row,0)
                 try:
-                    chosen_retailer = np.argmax(retailer_values)
+                    chosen_retailer_row = np.argmax(retailer_values[:,1])
+                    chosen_retailer = int(retailer_values[chosen_retailer_row,0])
                 except ValueError:
                     print("None of the retailers have enough stock.")
                     print("Patient "+str(patient)+" can't buy from anyone.")
-                    print(retailer_inventory)
                     StockLeft = False
                     break
             if StockLeft:
@@ -259,8 +280,9 @@ for run_number in range(1, total_runs+1):
                 retailer_inventory[retailer] += new_stock
                 new_quality = supplier_quality[chosen_supplier]
                 
-                # new quality is weighted average of old and new quality
-                retailer_quality[retailer] = (retailer_quality[retailer]*old_inventory + new_stock*new_quality)/retailer_inventory[retailer]
+                # new quality is weighted average of old and new quality if new stock purchased
+                if new_stock > 0:
+                    retailer_quality[retailer] = (retailer_quality[retailer]*old_inventory + new_stock*new_quality)/(old_inventory+new_stock)
                 
                 # update supplier stock and cash
                 # if supplier has stock, reduce stock 
@@ -312,25 +334,56 @@ for run_number in range(1, total_runs+1):
                 supplier_price[supplier] = 1+r.random()
                 supplier_quality[supplier] = r.random()
                 suppliers_bankrupt+=1
-                
-            # supplier list not rearranged so can write directly to file
-            SupplierPrices.write(str(supplier_price[supplier]) + ",")
-            SupplierQualities.write(str(supplier_quality[supplier]) +",")
+            
+            if step_number%(total_steps/40.0) == 0:    
+                # supplier list not rearranged so can write directly to file
+                SupplierPrices.write(str(float(supplier_price[supplier])) + ",")
+                SupplierQualities.write(str(float(supplier_quality[supplier])) +",")
+                SupplierInventories.write(str(int(supplier_inventory[supplier]))+",")
         
-        SupplierPrices.write("\n")
-        SupplierQualities.write("\n")
-        
-        # write values to files (need to do another retailer loop as retailers are rearranged)
-        
-        for retailer in range(0,number_retailers):
-            RetailerPrices.write(str(retailer_price[retailer]) + ",")
-            RetailerQualities.write(str(retailer_quality[retailer])+",")
-        RetailerPrices.write("\n")
-        RetailerQualities.write("\n")
-       
+        if step_number%(total_steps/40.0) == 0:
+            TimeSteps.write(str(step_number) + "\n")
+            SupplierPrices.write("\n")
+            SupplierQualities.write("\n")
+            SupplierInventories.write("\n")
+            
+            # write values to files (need to do another retailer loop as retailers are rearranged)
+            
+            for retailer in range(0,number_retailers):
+                RetailerPrices.write(str(float(retailer_price[retailer])) + ",")
+                RetailerQualities.write(str(float(retailer_quality[retailer]))+",")
+                RetailerInventories.write(str(int(retailer_inventory[retailer])) + ",")
+                TrustInRetailers.write(str(float(np.mean(patient_retailer_trust[:,retailer]))) + ",")
+                if gossip_mode == "f":
+                    RetailerGossipTrust.write(str(float(np.mean(gossip_trust[:,retailer]))) + ",")
+            RetailerPrices.write("\n")
+            RetailerQualities.write("\n")
+            RetailerInventories.write("\n")
+            TrustInRetailers.write("\n")
+            if gossip_mode == "f":
+                RetailerGossipTrust.write("\n")
+            
+
+        # give percentage of this run's completion every 10%
+        if step_number%(total_steps/10.0) == 0:
+            print(str(systime.strftime("%H:%M:%S") + " - " + str(int(step_number*100/total_steps)) + "% of run " + str(run_number) + " of " + str(total_runs) +" complete"))
+    
+    # Print number of bankrupt retailers and suppliers over run
+    print("Supplier bankrupties in run " + str(run_number) + ": " + str(suppliers_bankrupt))
+    print("Retailer bankrupties in run " + str(run_number) + ": " + str(retailers_bankrupt))
+    
     ## Close output files
     RetailerPrices.close()
     RetailerQualities.close()
+    RetailerInventories.close()
     SupplierPrices.close()
     SupplierQualities.close()
+    SupplierInventories.close()
+    TimeSteps.close()
+    TrustInRetailers.close()
+    if gossip_mode == "f":
+        RetailerGossipTrust.close()
+
+# Indicate simulation time    
+print("Time taken: " + str(systime.clock()) + "s")
             
