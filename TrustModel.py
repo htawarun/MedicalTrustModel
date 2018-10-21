@@ -102,7 +102,6 @@ for run_number in range(1, total_runs+1):
     os.mkdir("Run" + str(run_number))
     
     ## Open files for writing
-    TimeSteps = open("Run"+str(run_number)+"/TimeSteps.csv","w")
     RetailerPrices = open("Run" + str(run_number) + "/RetailerPrices.csv","w")
     RetailerQualities = open("Run" + str(run_number) + "/RetailerQualities.csv","w")
     RetailerInventories = open("Run" + str(run_number) + "/RetailerInventories.csv","w")
@@ -111,12 +110,53 @@ for run_number in range(1, total_runs+1):
     SupplierInventories = open("Run" + str(run_number) + "/SupplierInventories.csv","w")
     TrustInRetailers = open("Run" + str(run_number) + "/TrustInRetailers.csv","w")
     if gossip_mode == "f":
-        RetailerGossipTrust = open("Run" + str(run_number) + "GossipTrust/.csv","w")
+        RetailerGossipTrust = open("Run" + str(run_number) + "/GossipTrust.csv","w")
+    RetailerBankruptcy = open("Run" + str(run_number) + "/RetailerBankruptcy.csv","w")
+    SupplierBankruptcy = open("Run" + str(run_number) + "/SupplierBankruptcy.csv","w")
+    TrustInSuppliers = open("Run" + str(run_number) + "/TrustInSuppliers.csv","w")
     
+    # Write values identifying retailers and suppliers as first line in retailer and supplier files
+    RetailerPrices.write("Timestep\Retailer")
+    RetailerQualities.write("Timestep\Retailer")
+    RetailerInventories.write("Timestep\Retailer")
+    SupplierPrices.write("Timestep\Supplier")
+    SupplierQualities.write("Timestep\Supplier")
+    SupplierInventories.write("Timestep\Supplier")
+    TrustInRetailers.write("Timestep\Retailer")
+    if gossip_mode == "f":
+        RetailerGossipTrust.write("Timestep\Retailer")
+    TrustInSuppliers.write("Timestep\Supplier")
+    
+    for j in range(0, number_retailers):
+        RetailerPrices.write("," + str(j))
+        RetailerQualities.write("," + str(j))
+        RetailerInventories.write("," +str(j))
+        TrustInRetailers.write("," +str(j))
+        if gossip_mode == "f":
+            RetailerGossipTrust.write("," +str(j))
+    for k in range(0, number_suppliers):
+        SupplierPrices.write("," + str(k))
+        SupplierQualities.write("," + str(k))
+        SupplierInventories.write("," + str(k))
+        TrustInSuppliers.write("," + str(k))
+    
+    RetailerPrices.write("\n 0")
+    RetailerQualities.write("\n 0")
+    RetailerInventories.write("\n 0")
+    TrustInRetailers.write("\n 0")
+    if gossip_mode == "f":
+        RetailerGossipTrust.write("\n 0")  
+    SupplierPrices.write("\n 0")
+    SupplierQualities.write("\n 0")
+    SupplierInventories.write("\n 0")
+    TrustInSuppliers.write("\n 0")
+    
+        
     ## Initialise values
     
     # patients initially have neutral trust for each retailer
     patient_retailer_trust.fill(0.5)
+
     
     # retailers initially have neutral trust for each supplier
     retailer_supplier_trust.fill(0.5)
@@ -148,33 +188,51 @@ for run_number in range(1, total_runs+1):
             
     ## Write initial values into output files
     for retailer in range(0,number_retailers):
-        RetailerPrices.write(str(float(retailer_price[retailer])) + ",")
-        RetailerQualities.write(str(float(retailer_quality[retailer]))+",")
-        RetailerInventories.write(str(int(retailer_inventory[retailer]))+ ",")
-        TrustInRetailers.write(str(float(np.mean(patient_retailer_trust[:,retailer]))) + ",")
+        RetailerPrices.write("," + str(float(retailer_price[retailer])))
+        RetailerQualities.write("," + str(float(retailer_quality[retailer])))
+        RetailerInventories.write("," + str(int(retailer_inventory[retailer])))
+        TrustInRetailers.write("," + str(float(np.mean(patient_retailer_trust[:,retailer]))))
+        
+        
         if gossip_mode == "f":
-            RetailerGossipTrust.write(str(float(np.mean(gossip_trust[:,retailer]))) + ",")
+            RetailerGossipTrust.write("," + str(float(np.mean(gossip_trust[:,retailer]))))
     RetailerPrices.write("\n")
     RetailerQualities.write("\n")
     RetailerInventories.write("\n")
     TrustInRetailers.write("\n")
     if gossip_mode == "f":
         RetailerGossipTrust.write("\n")
+    RetailerBankruptcy.write("Step number, Retailers \n")
     
     for supplier in range(0, number_suppliers):
-        SupplierPrices.write(str(supplier_price[supplier]) + ",")
-        SupplierQualities.write(str(supplier_quality[supplier]) +",")
-        SupplierInventories.write(str(int(supplier_inventory[supplier]))+ ",")
+        SupplierPrices.write("," + str(float(supplier_price[supplier])))
+        SupplierQualities.write("," + str(float(supplier_quality[supplier])))
+        SupplierInventories.write("," + str(int(supplier_inventory[supplier])))
+        TrustInSuppliers.write("," + str(float(np.mean(retailer_supplier_trust[:,supplier]))))
 
     SupplierPrices.write("\n")
     SupplierQualities.write("\n")
     SupplierInventories.write("\n")
-    
+    SupplierBankruptcy.write("Step number, Retailers \n") 
+    TrustInSuppliers.write("\n")
     
     
     ## Start time loop
     for step_number in range(1, total_steps+1):
-
+        
+        # write step number to files if one of the 40 data points
+        if step_number%(total_steps/40.0) == 0:
+            RetailerPrices.write(str(step_number))
+            RetailerQualities.write(str(step_number))
+            RetailerInventories.write(str(step_number))
+            TrustInRetailers.write(str(step_number))
+            if gossip_mode == "f":
+                RetailerGossipTrust.write(str(step_number))  
+            SupplierPrices.write(str(step_number))
+            SupplierQualities.write(str(step_number))
+            SupplierInventories.write(str(step_number))
+            TrustInSuppliers.write(str(step_number))
+        
         
         # shuffle patient and retailer lists
         r.shuffle(patient_list)
@@ -184,8 +242,8 @@ for run_number in range(1, total_runs+1):
         # determine public gossip trust in each retailer
         if gossip_mode == "p":
             for retailer in retailer_list:
-                average_trust = patient_retailer_trust[:,retailer].mean()
-                gossip_trust[retailer]=average_trust
+                gossip_trust[retailer]= np.mean(patient_retailer_trust[:,retailer])
+
         
         # iterate over all patients
         for patient in patient_list:
@@ -210,7 +268,7 @@ for run_number in range(1, total_runs+1):
                             communal_trust.append(patient_retailer_trust[patient-i+number_patients,retailer])
                             communal_trust.append(patient_retailer_trust[patient+i,retailer])
                         else:
-                            communal_trust.append(patient_retailer_trust[patient+i,retailer])
+                            communal_trust.append(patient_retailer_trust[patient+i, retailer])
                             communal_trust.append(patient_retailer_trust[patient-i,retailer])
                     average_trust = np.array(communal_trust).mean()
                     gossip_trust[patient, retailer] = average_trust
@@ -315,6 +373,7 @@ for run_number in range(1, total_runs+1):
                 retailer_supplier_interaction_count[retailer,:].fill(0)
                 patient_retailer_interaction_count[:,retailer].fill(0)
                 retailers_bankrupt += 1
+                RetailerBankruptcy.write(str(step_number) + "," + str(int(retailer)) + ", \n")
                 
         for supplier in supplier_list:
             
@@ -334,28 +393,30 @@ for run_number in range(1, total_runs+1):
                 supplier_price[supplier] = 1+r.random()
                 supplier_quality[supplier] = r.random()
                 suppliers_bankrupt+=1
+                SupplierBankruptcy.write(str(step_number) + "," + str(int(supplier)) + ", \n")
             
             if step_number%(total_steps/40.0) == 0:    
                 # supplier list not rearranged so can write directly to file
-                SupplierPrices.write(str(float(supplier_price[supplier])) + ",")
-                SupplierQualities.write(str(float(supplier_quality[supplier])) +",")
-                SupplierInventories.write(str(int(supplier_inventory[supplier]))+",")
+                SupplierPrices.write("," + str(float(supplier_price[supplier])) )
+                SupplierQualities.write("," + str(float(supplier_quality[supplier])) )
+                SupplierInventories.write("," + str(int(supplier_inventory[supplier])))
+                TrustInSuppliers.write("," + str(float(np.mean(retailer_supplier_trust[:,supplier]))))
         
         if step_number%(total_steps/40.0) == 0:
-            TimeSteps.write(str(step_number) + "\n")
             SupplierPrices.write("\n")
             SupplierQualities.write("\n")
             SupplierInventories.write("\n")
+            TrustInSuppliers.write("\n")
             
             # write values to files (need to do another retailer loop as retailers are rearranged)
             
             for retailer in range(0,number_retailers):
-                RetailerPrices.write(str(float(retailer_price[retailer])) + ",")
-                RetailerQualities.write(str(float(retailer_quality[retailer]))+",")
-                RetailerInventories.write(str(int(retailer_inventory[retailer])) + ",")
-                TrustInRetailers.write(str(float(np.mean(patient_retailer_trust[:,retailer]))) + ",")
+                RetailerPrices.write("," + str(float(retailer_price[retailer])))
+                RetailerQualities.write("," + str(float(retailer_quality[retailer])))
+                RetailerInventories.write("," + str(int(retailer_inventory[retailer])))
+                TrustInRetailers.write("," + str(float(np.mean(patient_retailer_trust[:,retailer]))))
                 if gossip_mode == "f":
-                    RetailerGossipTrust.write(str(float(np.mean(gossip_trust[:,retailer]))) + ",")
+                    RetailerGossipTrust.write("," + str(float(np.mean(gossip_trust[:,retailer]))))
             RetailerPrices.write("\n")
             RetailerQualities.write("\n")
             RetailerInventories.write("\n")
@@ -369,8 +430,8 @@ for run_number in range(1, total_runs+1):
             print(str(systime.strftime("%H:%M:%S") + " - " + str(int(step_number*100/total_steps)) + "% of run " + str(run_number) + " of " + str(total_runs) +" complete"))
     
     # Print number of bankrupt retailers and suppliers over run
-    print("Supplier bankrupties in run " + str(run_number) + ": " + str(suppliers_bankrupt))
-    print("Retailer bankrupties in run " + str(run_number) + ": " + str(retailers_bankrupt))
+    SupplierBankruptcy.write("Total bankruptcies: " + str(suppliers_bankrupt))
+    RetailerBankruptcy.write("Total bankruptcies: " + str(retailers_bankrupt))
     
     ## Close output files
     RetailerPrices.close()
@@ -379,10 +440,12 @@ for run_number in range(1, total_runs+1):
     SupplierPrices.close()
     SupplierQualities.close()
     SupplierInventories.close()
-    TimeSteps.close()
     TrustInRetailers.close()
     if gossip_mode == "f":
         RetailerGossipTrust.close()
+    RetailerBankruptcy.close()
+    SupplierBankruptcy.close()
+    TrustInSuppliers.close()
 
 # Indicate simulation time    
 print("Time taken: " + str(systime.clock()) + "s")
