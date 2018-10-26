@@ -9,30 +9,16 @@ Simple model trying to describe the evolution of trust in medecine, based on pre
 
 ## Input files
 
-The input file must be in the following format:
+See standard_input for input file format.
 
-Trust model type: [string] # c for cumulative, b for bounded
+## aggressiveTrustModel.py
 
-Trust weight: [float] # float between 0 and 1
+Most recent version of script. Requires input file name as command line argument.
 
-Gossip mode: [string] # p for public, f for friend based
+## simplotter.py
 
-Gossip weight: [float] # float between 0 and 1
+Used for plotting data produced by aggressiveTrustModel.py.
 
-Runs: [int] # integer number of simulation runs
+## runmodels.bash
 
-Steps: [int] # integer number of timesteps
-
-Patients: [int] # integer number of patients
-
-Retailers: [int] # integer number of retailers
-
-Suppliers: [int] # integer number of suppliers
-
-Standard distance: [float] # float, smallest possible distance between patient and retailer
-
-Retailer overhead: [int] # integer, inventory removed from retailer at the end of a round
-
-Supplier overhead: [int] # integer, inventory removed from supplier at the end of a round
-
-## 
+Bash script to run simulations in all subdirectories. Requires input files in subdirectories and aggressiveTrustModel.py in current working directory.
