@@ -23,7 +23,7 @@ def trust_update(trust, product_quality, interaction_number, trust_model_type):
     """
     if trust_model_type == 'c':
         trust += product_quality + r.random() - 0.5 # want random to be centred on 0
-    elif trust_model_type == 'b':
+    else:
         trust = float((interaction_number*trust + product_quality + r.random() - 0.5)/(interaction_number+1))
     return trust
 
