@@ -130,7 +130,7 @@ for run_number in range(1, total_runs+1):
     SupplierInventories = open("Run" + str(run_number) + "/SupplierInventories.csv","w")
     SupplierBankruptcy = open("Run" + str(run_number) + "/SupplierBankruptcy.csv","w")
     TrustInSuppliers = open("Run" + str(run_number) + "/TrustInSuppliers.csv","w")
-    R_S_interactions = open("Run" + + str(run_number) + "/RSInteractionCounts.csv","w")
+    R_S_interactions = open("Run" +  str(run_number) + "/RSInteractionCounts.csv","w")
     
     
     # Write values identifying retailers and suppliers as first line in retailer and supplier files
@@ -261,7 +261,7 @@ for run_number in range(1, total_runs+1):
     for step_number in range(1, total_steps+1):
         
         # write step number to files if one of the 40 data points
-        if step_number%int(total_steps/40.0) == 0:
+        if step_number%(total_steps/40.0) == 0:
             RetailerPrices.write(str(step_number))
             RetailerQualities.write(str(step_number))
             RetailerInventories.write(str(step_number))
@@ -352,8 +352,8 @@ for run_number in range(1, total_runs+1):
                     StockLeft = False
                     
                     # no stock left so add nans to patient prices and quality and add to no stock counter
-                    patient_prices[0,patient] = np.nan
-                    patient_quality[0,patient] = np.nan
+                    patient_prices[patient,0] = np.nan
+                    patient_quality[patient,0] = np.nan
                     
                     break
             if StockLeft:
@@ -367,8 +367,8 @@ for run_number in range(1, total_runs+1):
                 patient_retailer_trust[patient,chosen_retailer] = trust_update(patient_retailer_trust[patient,chosen_retailer], medicine_quality,  patient_retailer_interaction_count[patient,chosen_retailer], trust_model_type)
                 
                 # add patient price and quality to arrays
-                patient_prices[0,patient] = retailer_price[chosen_retailer]
-                patient_quality[0,patient] = medicine_quality
+                patient_prices[patient,0] = retailer_price[chosen_retailer]
+                patient_quality[patient,0] = medicine_quality
                 
                 
         # iterate over all retailers
@@ -450,7 +450,7 @@ for run_number in range(1, total_runs+1):
                 suppliers_bankrupt+=1
                 SupplierBankruptcy.write(str(step_number) + "," + str(int(supplier)) + ", \n")
             
-            if step_number%int(total_steps/40.0) == 0:    
+            if step_number%(total_steps/40.0) == 0:    
                 # supplier list not rearranged so can write directly to file
                 SupplierPrices.write("," + str(float(supplier_price[supplier])) )
                 SupplierQualities.write("," + str(float(supplier_quality[supplier])) )
@@ -459,7 +459,7 @@ for run_number in range(1, total_runs+1):
                 R_S_interactions.write("," + str(np.sum(retailer_supplier_interaction_count[:,supplier])))
                 
         
-        if step_number%int(total_steps/40.0) == 0:
+        if step_number%(total_steps/40.0) == 0:
             SupplierPrices.write("\n")
             SupplierQualities.write("\n")
             SupplierInventories.write("\n")
@@ -486,8 +486,8 @@ for run_number in range(1, total_runs+1):
             
             # write supplier prices and qualities for this step to file
             for patient in range(0, number_patients):
-                PatientPrices.write("," + str(patient_prices[0,patient]))
-                PatientQualities.write("," + str(patient_quality[0, patient]))
+                PatientPrices.write("," + str(patient_prices[patient,0]))
+                PatientQualities.write("," + str(patient_quality[patient,0]))
                 
             PatientPrices.write("\n")
             PatientQualities.write("\n")
