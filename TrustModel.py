@@ -354,7 +354,6 @@ for run_number in range(1, total_runs+1):
                     # no stock left so add nans to patient prices and quality and add to no stock counter
                     patient_prices[0,patient] = np.nan
                     patient_quality[0,patient] = np.nan
-                    no_stock[step_number - 1] += 1 
                     
                     break
             if StockLeft:
@@ -457,12 +456,15 @@ for run_number in range(1, total_runs+1):
                 SupplierQualities.write("," + str(float(supplier_quality[supplier])) )
                 SupplierInventories.write("," + str(int(supplier_inventory[supplier])))
                 TrustInSuppliers.write("," + str(float(np.mean(retailer_supplier_trust[:,supplier]))))
+                R_S_interactions.write("," + str(np.sum(retailer_supplier_interaction_count[:,supplier])))
+                
         
         if step_number%int(total_steps/40.0) == 0:
             SupplierPrices.write("\n")
             SupplierQualities.write("\n")
             SupplierInventories.write("\n")
             TrustInSuppliers.write("\n")
+            R_S_interactions.write("\n")
             
             # write values to files (need to do another retailer loop as retailers are rearranged)
             
@@ -471,6 +473,7 @@ for run_number in range(1, total_runs+1):
                 RetailerQualities.write("," + str(float(retailer_quality[retailer])))
                 RetailerInventories.write("," + str(int(retailer_inventory[retailer])))
                 TrustInRetailers.write("," + str(float(np.mean(patient_retailer_trust[:,retailer]))))
+                P_R_interactions.write("," + str(np.sum(patient_retailer_interaction_count[:,retailer])))
                 if gossip_mode == "f":
                     RetailerGossipTrust.write("," + str(float(np.mean(gossip_trust[:,retailer]))))
             RetailerPrices.write("\n")
@@ -479,7 +482,15 @@ for run_number in range(1, total_runs+1):
             TrustInRetailers.write("\n")
             if gossip_mode == "f":
                 RetailerGossipTrust.write("\n")
+            P_R_interactions.write("\n")
             
+            # write supplier prices and qualities for this step to file
+            for patient in range(0, number_patients):
+                PatientPrices.write("," + str(patient_prices[0,patient]))
+                PatientQualities.write("," + str(patient_quality[0, patient]))
+                
+            PatientPrices.write("\n")
+            PatientQualities.write("\n")
 
         # give percentage of this run's completion every 10%
         if step_number%(total_steps/10.0) == 0:
