@@ -94,17 +94,24 @@ supplier_inventory = np.zeros((number_suppliers,1))
 supplier_cash = np.zeros((number_suppliers,1))
 supplier_quality = np.zeros((number_suppliers,1))
 
-# patient information
-patient_quality = np.zeros((number_patients,1)) # qualitiesof medicine bought by patients
-patient_prices = np.zeros((number_patients,1)) # prices of medicine bought by patients
 
 ## Bankruptcy counts
 retailers_bankrupt = 0
 suppliers_bankrupt = 0
 
+# Set patient - retailer distances
+for j in range(0, number_retailers):
+    for i in range(0, number_patients):
+        clockwise_separation = standard_distance*abs(i-j*number_patients/number_retailers)
+        anticlockwise_separation = standard_distance*abs(number_patients - i + j*number_patients/number_retailers)
+        patient_retailer_distance[i,j] = min(clockwise_separation, anticlockwise_separation)
 
 ## Start runs
 for run_number in range(1, total_runs+1):
+    
+    # patient information
+    patient_quality = np.zeros((number_patients,1)) # qualitiesof medicine bought by patients
+    patient_prices = np.zeros((number_patients,1)) # prices of medicine bought by patients
     
     ## Make directory for output files
     os.mkdir("Run" + str(run_number))
@@ -151,6 +158,7 @@ for run_number in range(1, total_runs+1):
     R_S_interactions.write("Timestep\Supplier")
     
     for j in range(0, number_retailers):
+        # retailer indices into output files
         RetailerPrices.write("," + str(j))
         RetailerQualities.write("," + str(j))
         RetailerInventories.write("," +str(j))
@@ -180,8 +188,8 @@ for run_number in range(1, total_runs+1):
     SupplierQualities.write("\n 0")
     SupplierInventories.write("\n 0")
     TrustInSuppliers.write("\n 0")
-    P_R_interactions.write("\n 0")
-    R_S_interactions.write("\n 0")
+    P_R_interactions.write("\n")
+    R_S_interactions.write("\n")
     PatientPrices.write("\n ")
     PatientQualities.write("\n ")
         
@@ -210,11 +218,7 @@ for run_number in range(1, total_runs+1):
         retailer_quality[j] = r.random() # quality
         retailer_price[j]=1+r.random() # price
         
-        # Set patient - retailer distances
-        for i in range(0, number_patients):
-            clockwise_separation = standard_distance*abs(i-j*number_patients/number_retailers)
-            anticlockwise_separation = standard_distance*abs(number_patients - i + j*number_patients/number_retailers)
-            patient_retailer_distance[i,j] = min(clockwise_separation, anticlockwise_separation)
+
     
     # supplier and retailer bankruptcy counters
     suppliers_bankrupt = 0
@@ -229,7 +233,7 @@ for run_number in range(1, total_runs+1):
         RetailerQualities.write("," + str(float(retailer_quality[retailer])))
         RetailerInventories.write("," + str(int(retailer_inventory[retailer])))
         TrustInRetailers.write("," + str(float(np.mean(patient_retailer_trust[:,retailer]))))
-        P_R_interactions.write("," + str(float(np.mean(patient_retailer_interaction_count[:,retailer]))))
+        P_R_interactions.write("," + str(0))
         
         if gossip_mode == "f":
             RetailerGossipTrust.write("," + str(float(np.mean(gossip_trust[:,retailer]))))
@@ -246,7 +250,7 @@ for run_number in range(1, total_runs+1):
         SupplierQualities.write("," + str(float(supplier_quality[supplier])))
         SupplierInventories.write("," + str(int(supplier_inventory[supplier])))
         TrustInSuppliers.write("," + str(float(np.mean(retailer_supplier_trust[:,supplier]))))
-        R_S_interactions.write("," + str(float(np.mean(retailer_supplier_interaction_count[:,supplier]))))
+        R_S_interactions.write("," + str(0))
 
     SupplierPrices.write("\n")
     SupplierQualities.write("\n")
