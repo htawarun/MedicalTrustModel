@@ -140,12 +140,12 @@ def get_data(gossip_mode):
                 patient_q_p_mean_error = np.zeros((np.ma.size(ptimesteps), 2))
                 
                 for n in range(0, np.ma.size(ptimesteps)):
-                    patient_q_mean_error[i,0] = np.mean(patient_quality[i,:])
-                    patient_q_mean_error[i,1] = np.std(patient_quality[i,:])/math.sqrt(np.ma.size(patient_quality[i,:]))
-                    patient_p_mean_error[i,0] = np.mean(patient_price[i,:])
-                    patient_p_mean_error[i,1] = np.std(patient_price[i,:]))/math.sqrt(np.ma.size(patient_price[i,:]))
-                    patient_q_p_mean_error[i,0] = np.mean(patient_quality_price[i,:])
-                    patient_q_p_mean_error[i,1] = np.std(patient_quality_price[i,:]))/math.sqrt(np.ma.size(patient_quality_price[i,:]))
+                    patient_q_mean_error[n,0] = np.mean(patient_quality[n,:])
+                    patient_q_mean_error[n,1] = np.std(patient_quality[n,:])/math.sqrt(np.ma.size(patient_quality[n,:]))
+                    patient_p_mean_error[n,0] = np.mean(patient_price[n,:])
+                    patient_p_mean_error[n,1] = np.std(patient_price[n,:])/math.sqrt(np.ma.size(patient_price[n,:]))
+                    patient_q_p_mean_error[n,0] = np.mean(patient_quality_price[n,:])
+                    patient_q_p_mean_error[n,1] = np.std(patient_quality_price[n,:])/math.sqrt(np.ma.size(patient_quality_price[n,:]))
                 
                 for i in range(0,np.ma.size(timesteps)):
                     
@@ -385,7 +385,7 @@ def patient_mean_plotter(patient_mean_data):
         timesteps = run[1]
         price = run[2]
         quality = run[3]
-        QP = run[5]
+        QP = run[4]
         
         # add mean values over time
         for i in range(0, len(timesteps)):
@@ -399,8 +399,6 @@ def patient_mean_plotter(patient_mean_data):
         
     mean_QP_allruns = np.zeros(np.ma.size(means_QP,1))
     error_QP_allruns =np.zeros(np.ma.size(means_QP,1)) 
-    mean_trust_allruns= np.zeros(np.ma.size(means_trust,1))
-    error_trust_allruns= np.zeros(np.ma.size(means_trust,1))
     mean_price_allruns = np.zeros(np.ma.size(means_price,1))
     error_price_allruns = np.zeros(np.ma.size(means_price,1))
     mean_quality_allruns = np.zeros(np.ma.size(means_quality,1))
