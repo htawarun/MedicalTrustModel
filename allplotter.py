@@ -48,7 +48,7 @@ for i in range(1, len(sys.argv)):
     alldata.append(data)
 
 for i in range(0, np.ma.size(data, 1)):
-    name = varnames[i+1]
+    name = varnames[i+1].strip('\n')
     for j in range(0, len(filenames)):
         plt.plot(alltimesteps[j], alldata[j][:,i], colours[j], label = filenames[j])
     plt.title(name + " over time")
