@@ -410,8 +410,8 @@ def patient_mean_plotter(patient_mean_data):
     foldername = os.path.basename(dirpath)
     meanfile = open("PatientData/" + foldername, "w")
     errorsfile = open("PatientData/AllRunsErrors","w")
-    meanfile.write("timestep, mean price, mean quality, mean quality/price \n")
-    errorsfile.write("timestep, error price, error quality, error quality/price \n")
+    meanfile.write("timestep,mean price,mean quality,mean QP\n")
+    errorsfile.write("timestep, error price, error quality, error QP \n")
     
     # calculate means and errors over all runs
     for i in range(0, np.ma.size(means_QP,1)):
@@ -549,8 +549,8 @@ def retailer_mean_plotter(retailer_mean_data):
     foldername = os.path.basename(dirpath)
     meanfile = open("RetailerData/" + foldername, "w")
     errorsfile = open("RetailerData/AllRunsErrors","w")
-    meanfile.write("timestep, mean price, mean quality, mean quality/price, mean trust \n")
-    errorsfile.write("timestep, error price, error quality, error quality/price, error trust \n")
+    meanfile.write("timestep, mean price, mean quality, mean QP, mean trust \n")
+    errorsfile.write("timestep, error price, error quality, error QP, error trust \n")
     
     # calculate means and errors over all runs
     for i in range(0, np.ma.size(means_QP,1)):

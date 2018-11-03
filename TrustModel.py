@@ -216,7 +216,7 @@ for run_number in range(1, total_runs+1):
     retailer_cash.fill(10) # cash
     for j in range(0, number_retailers):
         retailer_quality[j] = r.random() # quality
-        retailer_price[j]=1+r.random() # price
+        retailer_price[j]=1+2*r.random() # price
         
 
     
@@ -289,7 +289,11 @@ for run_number in range(1, total_runs+1):
         # determine public gossip trust in each retailer
         if gossip_mode == "p":
             for retailer in retailer_list:
-                gossip_trust[retailer]= np.mean(patient_retailer_trust[:,retailer])
+                PR_tested_trust = patient_retailer_trust[:,retailer][patient_retailer_trust[:,retailer] != 0.5]
+                if np.ma.size(PR_tested_trust)<1:
+                    gossip_trust[retailer]= np.mean(patient_retailer_trust[:,retailer])
+                else:    
+                    gossip_trust[retailer]= np.mean(PR_tested_trust)
 
         
         # iterate over all patients
