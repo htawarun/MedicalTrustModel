@@ -82,6 +82,8 @@ def get_data(gossip_mode):
     retailer_mean_data = []
     supplier_data = []
     supplier_mean_data = []
+    patient_data = []
+    patient_mean_data = []
     
     for directory in os.listdir("."):
         if os.path.isdir(directory):
@@ -102,10 +104,13 @@ def get_data(gossip_mode):
                 if gossip_mode == "f":
                     timesteps, gossip_trust = read_newdata(directory + "/GossipTrust.csv")
                         
+                ptimesteps, patient_price = read_newdata(directory+"/PatientPrices.csv")
+                ptimesteps, patient_quality = read_newdata(directory + "/PatientQualities.csv")
                         
                 # interesting calculations
                 retailer_quality_price = np.divide(retailer_quality, retailer_price)
                 supplier_quality_price = np.divide(supplier_quality, supplier_price)
+                patient_quality_price = np.divide(patient_quality, patient_price)
                 
                 # add data to list for this run
                 retailer_run_list = [directory, timesteps, retailer_inventory, retailer_price, retailer_quality, retailer_trust, retailer_quality_price]
@@ -113,7 +118,7 @@ def get_data(gossip_mode):
                     retailer_run_list.append(gossip_trust)
                 supplier_run_list = [directory, timesteps, supplier_inventory, supplier_price, supplier_quality, supplier_quality_price]
                 supplier_run_list.append(supplier_trust)
-                
+                patient_run_list = [directory, ptimesteps, patient_price, patient_quality, patient_quality_price]
                 
                 # get mean values and standard deviations over all retailers and suppliers
                 retailer_price_mean_error = np.zeros((np.ma.size(timesteps),2))
@@ -130,8 +135,20 @@ def get_data(gossip_mode):
                 
                 supplier_trust_mean_error = np.zeros((np.ma.size(timesteps),2))
                 
+                patient_q_mean_error = np.zeros((np.ma.size(ptimesteps), 2))
+                patient_p_mean_error = np.zeros((np.ma.size(ptimesteps), 2))
+                patient_q_p_mean_error = np.zeros((np.ma.size(ptimesteps), 2))
+                
+                for n in range(0, np.ma.size(ptimesteps)):
+                    patient_q_mean_error[i,0] = np.mean(patient_quality[i,:])
+                    patient_q_mean_error[i,1] = np.std(patient_quality[i,:])/math.sqrt(np.ma.size(patient_quality[i,:]))
+                    patient_p_mean_error[i,0] = np.mean(patient_price[i,:])
+                    patient_p_mean_error[i,1] = np.std(patient_price[i,:]))/math.sqrt(np.ma.size(patient_price[i,:]))
+                    patient_q_p_mean_error[i,0] = np.mean(patient_quality_price[i,:])
+                    patient_q_p_mean_error[i,1] = np.std(patient_quality_price[i,:]))/math.sqrt(np.ma.size(patient_quality_price[i,:]))
                 
                 for i in range(0,np.ma.size(timesteps)):
+                    
                     retailer_price_mean_error[i,0] = np.mean(retailer_price[i,:])
                     retailer_price_mean_error[i,1] = np.std(retailer_price[i,:])/math.sqrt(np.ma.size(retailer_price[i,:]))
                     retailer_quality_mean_error[i,0] = np.mean(retailer_quality[i,:])
@@ -164,12 +181,16 @@ def get_data(gossip_mode):
 
                 supplier_run_mean_list.append(supplier_trust_mean_error)
                 
+                patient_run_mean_list = [directory, ptimesteps, patient_p_mean_error, patient_q_mean_error, patient_q_p_mean_error]
+                
+                patient_data.append(patient_run_list)
+                patient_mean_data.append(patient_run_mean_list)
                 retailer_data.append(retailer_run_list)
                 retailer_mean_data.append(retailer_run_mean_list)
                 supplier_data.append(supplier_run_list)
                 supplier_mean_data.append(supplier_run_mean_list)
                     
-    return  retailer_data, retailer_mean_data, supplier_data, supplier_mean_data
+    return  retailer_data, retailer_mean_data, supplier_data, supplier_mean_data, patient_data, patient_mean_data
             
 
 ## make supplier histograms
@@ -337,6 +358,100 @@ def retailer_inv_histograms(retailer_data):
     
     
     
+def patient_mean_plotter(patient_mean_data):
+    try:
+        os.mkdir("PatientData")
+    except OSError:
+        print("Patient data file already exists")
+    
+    timesteps = patient_mean_data[0][1]
+    
+    # create arrays to have the mean quality/price and error over time for each run
+    means_QP = np.zeros((len(patient_mean_data),len(timesteps)))
+    errors_QP = np.zeros((len(patient_mean_data),len(timesteps)))
+    
+    # mean price and error arrays
+    means_price = np.zeros((len(patient_mean_data),len(timesteps)))
+    errors_price = np.zeros((len(patient_mean_data),len(timesteps)))
+    
+    # mean quality and error arrays
+    means_quality = np.zeros((len(patient_mean_data),len(timesteps)))
+    errors_quality = np.zeros((len(patient_mean_data),len(timesteps)))
+    
+    k = 0
+    
+    for run in patient_mean_data:
+        name = run[0]
+        timesteps = run[1]
+        price = run[2]
+        quality = run[3]
+        QP = run[5]
+        
+        # add mean values over time
+        for i in range(0, len(timesteps)):
+            means_QP[k,i] = QP[i,0]
+            errors_QP[k,i] = QP[i,1]
+            means_price[k,i] = price[i,0]
+            errors_price[k,i] = price[i,1]
+            means_quality[k,i] = quality[i,0]
+            errors_quality[k,i] = quality[i,1]
+        k+=1
+        
+    mean_QP_allruns = np.zeros(np.ma.size(means_QP,1))
+    error_QP_allruns =np.zeros(np.ma.size(means_QP,1)) 
+    mean_trust_allruns= np.zeros(np.ma.size(means_trust,1))
+    error_trust_allruns= np.zeros(np.ma.size(means_trust,1))
+    mean_price_allruns = np.zeros(np.ma.size(means_price,1))
+    error_price_allruns = np.zeros(np.ma.size(means_price,1))
+    mean_quality_allruns = np.zeros(np.ma.size(means_quality,1))
+    error_quality_allruns = np.zeros(np.ma.size(means_quality,1))
+    
+    
+    # open output file to write mean values into
+    dirpath = os.getcwd()
+    foldername = os.path.basename(dirpath)
+    meanfile = open("PatientData/" + foldername, "w")
+    errorsfile = open("PatientData/AllRunsErrors","w")
+    meanfile.write("timestep, mean price, mean quality, mean quality/price \n")
+    errorsfile.write("timestep, error price, error quality, error quality/price \n")
+    
+    # calculate means and errors over all runs
+    for i in range(0, np.ma.size(means_QP,1)):
+        mean_QP_allruns[i] = np.mean(means_QP[:,i])
+        error_QP_allruns[i] = (1/len(patient_mean_data))*math.sqrt(np.sum(np.square(errors_QP[:,i])))
+        mean_price_allruns[i] = np.mean(means_price[:,i])
+        error_price_allruns[i] = (1/len(patient_mean_data))*math.sqrt(np.sum(np.square(errors_price[:,i])))
+        mean_quality_allruns[i] = np.mean(means_quality[:,i])
+        error_quality_allruns[i] = (1/len(patient_mean_data))*math.sqrt(np.sum(np.square(errors_quality[:,i])))
+        
+        # write to file
+        meanfile.write(str(timesteps[i]) + "," + str(mean_price_allruns[i])  + "," + str(mean_quality_allruns[i]) + "," + str(mean_QP_allruns[i]) + "\n")
+        errorsfile.write(str(timesteps[i]) + "," + str(error_price_allruns[i])  + "," + str(error_quality_allruns[i]) + "," + str(error_QP_allruns[i]) + "\n")
+    
+    # graph QP for all runs
+    plt.errorbar(timesteps, mean_QP_allruns, yerr = error_QP_allruns, fmt= 'k.', capsize=2)
+    plt.title("Mean Quality/Price over time")
+    plt.xlabel("Step number")
+    plt.ylabel("Quality/Price")
+    plt.savefig("PatientData/Overall_Quality_Price.png")
+    plt.clf()
+
+    
+    # graph quality for all runs
+    plt.errorbar(timesteps, mean_quality_allruns, yerr = error_quality_allruns, fmt= 'k.', capsize=2)
+    plt.title("Mean Quality over time")
+    plt.xlabel("Step number")
+    plt.ylabel("Quality")
+    plt.savefig("PatientData/Overall_Quality.png")
+    plt.clf()    
+    
+    # graph price for all runs
+    plt.errorbar(timesteps, mean_price_allruns, yerr = error_price_allruns, fmt= 'k.', capsize=2)
+    plt.title("Mean Price over time")
+    plt.xlabel("Step number")
+    plt.ylabel("Price")
+    plt.savefig("PatientData/Overall_Price.png")
+    plt.clf()
 
 def retailer_mean_plotter(retailer_mean_data):
     """
@@ -386,6 +501,8 @@ def retailer_mean_plotter(retailer_mean_data):
             means_quality[k,i] = quality[i,0]
             errors_quality[k,i] = quality[i,1]
         k+=1
+        
+        
         """
         # graph quality over price
         plt.errorbar(timesteps, QP[:,0], yerr=QP[:,1], fmt='k.', capsize=2)
@@ -432,8 +549,8 @@ def retailer_mean_plotter(retailer_mean_data):
     # open output file to write mean values into
     dirpath = os.getcwd()
     foldername = os.path.basename(dirpath)
-    meanfile = open(foldername, "w")
-    errorsfile = open("AllRunsErrors","w")
+    meanfile = open("RetailerData/" + foldername, "w")
+    errorsfile = open("RetailerData/AllRunsErrors","w")
     meanfile.write("timestep, mean price, mean quality, mean quality/price, mean trust \n")
     errorsfile.write("timestep, error price, error quality, error quality/price, error trust \n")
     
@@ -489,8 +606,9 @@ def retailer_mean_plotter(retailer_mean_data):
 ## read command line
 gossip_mode = sys.argv[1] # f friendly, p public, 0 off
 
-retailer_data, retailer_mean_data, supplier_data, supplier_mean_data = get_data(gossip_mode)
+retailer_data, retailer_mean_data, supplier_data, supplier_mean_data, patient_data, patient_mean_data = get_data(gossip_mode)
 
 #supplier_inv_histograms(supplier_data)
 #retailer_inv_histograms(retailer_data)
 retailer_mean_plotter(retailer_mean_data)
+patient_mean_plotter(patient_mean_data)
