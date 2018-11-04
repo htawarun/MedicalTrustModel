@@ -4,11 +4,14 @@ find . -name "Run*" -type d -print -exec rm -rf {} +
 
 for d in */ ; do
     cd $d
+    echo $d
     rm TrustModel.py
-    echo "TrustModel removed"
     cp ../TrustModel.py .
+    rm singlesub
     cp ../singlesub .
-    sed -i "s/trust/trust$d/g" singlesub
+    result=${PWD##*/} 
+    echo $result
+    sed -i "s/trust/trust$result/g" singlesub
     qsub singlesub
     cd ..
 done
