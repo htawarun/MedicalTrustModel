@@ -126,8 +126,6 @@ for run_number in range(1, total_runs+1):
     RetailerQualities = open("Run" + str(run_number) + "/RetailerQualities.csv","w")
     RetailerInventories = open("Run" + str(run_number) + "/RetailerInventories.csv","w")
     TrustInRetailers = open("Run" + str(run_number) + "/TrustInRetailers.csv","w")
-    if gossip_mode == "f":
-        RetailerGossipTrust = open("Run" + str(run_number) + "/GossipTrust.csv","w")
     RetailerBankruptcy = open("Run" + str(run_number) + "/RetailerBankruptcy.csv","w")
     P_R_interactions = open("Run" + str(run_number) + "/PRInteractionCounts.csv","w")
         
@@ -140,43 +138,46 @@ for run_number in range(1, total_runs+1):
     R_S_interactions = open("Run" +  str(run_number) + "/RSInteractionCounts.csv","w")
     
     
-    # Write values identifying retailers and suppliers as first line in retailer and supplier files
-    RetailerPrices.write("Timestep\Retailer")
-    RetailerQualities.write("Timestep\Retailer")
-    RetailerInventories.write("Timestep\Retailer")
-    SupplierPrices.write("Timestep\Supplier")
-    SupplierQualities.write("Timestep\Supplier")
-    SupplierInventories.write("Timestep\Supplier")
-    TrustInRetailers.write("Timestep\Retailer")
-    if gossip_mode == "f":
-        RetailerGossipTrust.write("Timestep\Retailer")
-    TrustInSuppliers.write("Timestep\Supplier")
+    # Create strings to write to files
+    P_prices = "Timestep\Patient"
+    P_quals = "Timestep\Patient"
     
-    PatientPrices.write("Timestep\Patient")
-    PatientQualities.write("Timestep\Patient")
-    P_R_interactions.write("Timestep\Retailer")
-    R_S_interactions.write("Timestep\Supplier")
+    R_prices = "Timestep\Retailer"
+    R_qualities = "Timestep\Retailer"
+    R_invs = "Timestep\Retailer"
+    R_trusts = "Timestep\Retailer"
     
+    S_prices = "Timestep\Supplier"
+    S_qualities = "Timestep\Supplier"
+    S_invs = "Timestep\Supplier"
+    R_S_ints = "Timestep\Supplier"
+    S_trusts = "Timestep\Supplier"
+    
+    # lists to store strings
+    patient_strings = [P_prices, P_qualities]
+    retailer_strings = [R_prices, R_qualities, R_invs, P_R_ints, R_trusts]
+    supplier_strings = [S_prices, S_qualities, S_invs, R_S_ints, S_trusts]
+
+    # add retailer indices to strings
     for j in range(0, number_retailers):
-        # retailer indices into output files
-        RetailerPrices.write("," + str(j))
-        RetailerQualities.write("," + str(j))
-        RetailerInventories.write("," +str(j))
-        TrustInRetailers.write("," +str(j))
-        if gossip_mode == "f":
-            RetailerGossipTrust.write("," +str(j))
-        P_R_interactions.write("," +str(j))
+        for n in retailer_strings:
+            n += "," + str(j)
 
     for k in range(0, number_suppliers):
-        SupplierPrices.write("," + str(k))
-        SupplierQualities.write("," + str(k))
-        SupplierInventories.write("," + str(k))
-        TrustInSuppliers.write("," + str(k))
-        R_S_interactions.write("," + str(k))
+        for m in supplier_strings:
+            m += "," + str(k)
     
     for i in range(0, number_patients):
-        PatientPrices.write("," + str(i))
-        PatientQualities.write("," + str(i))
+        for l in patient_strings:
+            l += "," + str(i)
+    
+    for n in retailer_strings:
+        n += "\n 0"
+    
+    for m in supplier_strings:
+        m += "\n 0"
+        
+    
     
     RetailerPrices.write("\n 0")
     RetailerQualities.write("\n 0")
