@@ -1,0 +1,9 @@
+Trust model type: c # c for cumulative, b for bounded
+Trust weight: 1.0 # float between 0 and 1
+Gossip range: 2 # integer, only applicable in friend-based gossip model
+Steps: 10 # integer number of timesteps
+Patients: 1000 # integer number of patients
+Retailers: 100 # integer number of retailers
+Suppliers: 10 #integer number of suppliers
+Standard distance: 0.2 # float, smallest possible distance between patient and retailer
+Minimum lifetime: 4 # integer, shortest possible lifetime for suppliers and retailers before going bankrupt
