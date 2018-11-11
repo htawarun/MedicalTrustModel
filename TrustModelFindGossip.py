@@ -602,7 +602,7 @@ for gossip_weight in weights:
                     while retailer_inventory[chosen_retailer] < 1:
                         retailer_values = np.delete(retailer_values, chosen_retailer_row,0)
                         try:
-                            chosen_retailer_row = np.argmax(retailer_values[:,1])
+                            chosen_retailer_row = np.argmax(retailer_values[:,1])/home/s1457132/Documents/EvolutionOfTrustInMedecine/findGossip/simplotter.py
                             chosen_retailer = int(retailer_values[chosen_retailer_row,0])
                         except ValueError:
                             print("None of the retailers have enough stock.")
@@ -749,7 +749,7 @@ for gossip_weight in weights:
             os.mkdir(str(gossip_mode) + str(gossip_weight))
             
             ## Write to files
-            pfilenames = ["PatientQualities.csv", "PatientPrices.csv"]
+            pfilenames = ["PatientPrices.csv", "PatientQualities.csv"]
             rfilenames = ["RetailerPrices.csv", "RetailerQualities.csv", "RetailerInventories.csv", "TrustInRetailers.csv", "PRInteractionCounts.csv"]
             sfilenames = ["SupplierPrices.csv", "SupplierQualities.csv", "SupplierInventories.csv", "TrustInSuppliers.csv", "RSInteractionCounts.csv"]
             

@@ -104,8 +104,9 @@ def get_data(gossip_mode):
                 if gossip_mode == "f":
                     timesteps, gossip_trust = read_newdata(directory + "/GossipTrust.csv")
                         
-                ptimesteps, patient_price = read_newdata(directory+"/PatientPrices.csv")
-                ptimesteps, patient_quality = read_newdata(directory + "/PatientQualities.csv")
+                # lol mixup        
+                ptimesteps, patient_price = read_newdata(directory+"/PatientQualities.csv")
+                ptimesteps, patient_quality = read_newdata(directory + "/PatientPrices.csv")
                         
                 # interesting calculations
                 retailer_quality_price = np.divide(retailer_quality, retailer_price)
@@ -400,11 +401,11 @@ def patient_mean_plotter(patient_mean_data):
     # calculate means and errors over all runs
     for i in range(0, np.ma.size(means_QP,1)):
         mean_QP_allruns[i] = np.mean(means_QP[:,i])
-        error_QP_allruns[i] = np.std(means_QP[:,i]/math.sqrt(len(patient_mean_data))
+        error_QP_allruns[i] = np.std(means_QP[:,i])/math.sqrt(len(patient_mean_data))
         mean_price_allruns[i] = np.mean(means_price[:,i])
-        error_price_allruns[i] =  np.std(means_price[:,i]/math.sqrt(len(patient_mean_data))
+        error_price_allruns[i] =  np.std(means_price[:,i])/math.sqrt(len(patient_mean_data))
         mean_quality_allruns[i] = np.mean(means_quality[:,i])
-        error_quality_allruns[i] =  np.std(means_price[:,i]/math.sqrt(len(patient_mean_data))
+        error_quality_allruns[i] =  np.std(means_quality[:,i])/math.sqrt(len(patient_mean_data))
         
         # write to file
         meanfile.write(str(timesteps[i]) + "," + str(mean_price_allruns[i])  + "," + str(mean_quality_allruns[i]) + "," + str(mean_QP_allruns[i]) + "\n")
@@ -448,19 +449,19 @@ def retailer_mean_plotter(retailer_mean_data):
     
     # create arrays to have the mean quality/price and error over time for each run
     means_QP = np.zeros((len(retailer_mean_data),len(timesteps)))
-    errors_QP = np.zeros((len(retailer_mean_data),len(timesteps)))
+
     
     # create arrays to have mean trust and error over time for each run
     means_trust = np.zeros((len(retailer_mean_data),len(timesteps)))
-    errors_trust = np.zeros((len(retailer_mean_data),len(timesteps)))
+
     
     # mean price and error arrays
     means_price = np.zeros((len(retailer_mean_data),len(timesteps)))
-    errors_price = np.zeros((len(retailer_mean_data),len(timesteps)))
+
     
     # mean quality and error arrays
     means_quality = np.zeros((len(retailer_mean_data),len(timesteps)))
-    errors_quality = np.zeros((len(retailer_mean_data),len(timesteps)))
+
     
     k = 0
     
@@ -475,13 +476,9 @@ def retailer_mean_plotter(retailer_mean_data):
         # add mean values over time
         for i in range(0, len(timesteps)):
             means_QP[k,i] = QP[i,0]
-            errors_QP[k,i] = QP[i,1]
             means_trust[k,i] = trust[i,0]
-            errors_trust[k,i] = trust[i,1]
             means_price[k,i] = price[i,0]
-            errors_price[k,i] = price[i,1]
             means_quality[k,i] = quality[i,0]
-            errors_quality[k,i] = quality[i,1]
         k+=1
         
         
@@ -541,11 +538,11 @@ def retailer_mean_plotter(retailer_mean_data):
         mean_QP_allruns[i] = np.mean(means_QP[:,i])
         error_QP_allruns[i] = np.std(means_QP[:,i])/math.sqrt(len(retailer_mean_data))
         mean_trust_allruns[i] = np.mean(means_trust[:,i])
-        error_trust_allruns[i] = np.std(means_trust[:,i])/len(retailer_mean_data)
+        error_trust_allruns[i] = np.std(means_trust[:,i])/math.sqrt(len(retailer_mean_data))
         mean_price_allruns[i] = np.mean(means_price[:,i])
-        error_price_allruns[i] = np.std(means_price[:,i])/len(retailer_mean_data)
+        error_price_allruns[i] = np.std(means_price[:,i])/math.sqrt(len(retailer_mean_data))
         mean_quality_allruns[i] = np.mean(means_quality[:,i])
-        error_quality_allruns[i] = np.std(means_quality[:,i])/len(retailer_mean_data)
+        error_quality_allruns[i] = np.std(means_quality[:,i])/math.sqrt(len(retailer_mean_data))
         
         # write to file
         meanfile.write(str(timesteps[i]) + "," + str(mean_price_allruns[i])  + "," + str(mean_quality_allruns[i]) + "," + str(mean_QP_allruns[i]) + "," + str(mean_trust_allruns[i]) + "\n")
