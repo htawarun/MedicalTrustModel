@@ -389,14 +389,9 @@ def patient_mean_plotter(patient_mean_data):
     mean_quality_allruns = np.zeros(np.ma.size(means_quality,1))
     error_quality_allruns = np.zeros(np.ma.size(means_quality,1))
     
-    
-    # open output file to write mean values into
-    dirpath = os.getcwd()
-    foldername = os.path.basename(dirpath)
-    meanfile = open("PatientData/" + foldername, "w")
-    errorsfile = open("PatientData/AllRunsErrors","w")
-    meanfile.write("timestep,mean price,mean quality,mean QP\n")
-    errorsfile.write("timestep, error price, error quality, error QP \n")
+    meanstring = "timestep,mean price,mean quality,mean QP\n"
+    errorstring = "timestep, error price, error quality, error QP \n"
+
     
     # calculate means and errors over all runs
     for i in range(0, np.ma.size(means_QP,1)):
@@ -408,8 +403,8 @@ def patient_mean_plotter(patient_mean_data):
         error_quality_allruns[i] =  np.std(means_quality[:,i])/math.sqrt(len(patient_mean_data))
         
         # write to file
-        meanfile.write(str(timesteps[i]) + "," + str(mean_price_allruns[i])  + "," + str(mean_quality_allruns[i]) + "," + str(mean_QP_allruns[i]) + "\n")
-        errorsfile.write(str(timesteps[i]) + "," + str(error_price_allruns[i])  + "," + str(error_quality_allruns[i]) + "," + str(error_QP_allruns[i]) + "\n")
+        meanstring += str(timesteps[i]) + "," + str(mean_price_allruns[i])  + "," + str(mean_quality_allruns[i]) + "," + str(mean_QP_allruns[i]) + "\n"
+        errorstring += str(timesteps[i]) + "," + str(error_price_allruns[i])  + "," + str(error_quality_allruns[i]) + "," + str(error_QP_allruns[i]) + "\n"
     
     # graph QP for all runs
     plt.errorbar(timesteps, mean_QP_allruns, yerr = error_QP_allruns, fmt= 'k.', capsize=2)
@@ -435,6 +430,14 @@ def patient_mean_plotter(patient_mean_data):
     plt.ylabel("Price")
     plt.savefig("PatientData/Overall_Price.png")
     plt.clf()
+    
+    # open output file to write mean values into
+    dirpath = os.getcwd()
+    foldername = os.path.basename(dirpath)
+    with open("PatientData/" + foldername, "w") as meanfile:
+        meanfile.write(meanstring)
+    with open("PatientData/" + foldername + "Errors","w") as errorfile:
+        errorsfile.write(errorstring)
 
 def retailer_mean_plotter(retailer_mean_data):
     """
@@ -525,13 +528,9 @@ def retailer_mean_plotter(retailer_mean_data):
     error_quality_allruns = np.zeros(np.ma.size(means_quality,1))
     
     
-    # open output file to write mean values into
-    dirpath = os.getcwd()
-    foldername = os.path.basename(dirpath)
-    meanfile = open("RetailerData/" + foldername, "w")
-    errorsfile = open("RetailerData/AllRunsErrors","w")
-    meanfile.write("timestep, mean price, mean quality, mean QP, mean trust \n")
-    errorsfile.write("timestep, error price, error quality, error QP, error trust \n")
+    meanstring = "timestep, mean price, mean quality, mean QP, mean trust \n"
+    errorstring = "timestep, error price, error quality, error QP, error trust \n"
+
     
     # calculate means and errors over all runs
     for i in range(0, np.ma.size(means_QP,1)):
@@ -545,8 +544,8 @@ def retailer_mean_plotter(retailer_mean_data):
         error_quality_allruns[i] = np.std(means_quality[:,i])/math.sqrt(len(retailer_mean_data))
         
         # write to file
-        meanfile.write(str(timesteps[i]) + "," + str(mean_price_allruns[i])  + "," + str(mean_quality_allruns[i]) + "," + str(mean_QP_allruns[i]) + "," + str(mean_trust_allruns[i]) + "\n")
-        errorsfile.write(str(timesteps[i]) + "," + str(error_price_allruns[i])  + "," + str(error_quality_allruns[i]) + "," + str(error_QP_allruns[i]) + "," + str(error_trust_allruns[i]) + "\n")
+        meanstring += str(timesteps[i]) + "," + str(mean_price_allruns[i])  + "," + str(mean_quality_allruns[i]) + "," + str(mean_QP_allruns[i]) + "," + str(mean_trust_allruns[i]) + "\n"
+        errorstring += str(timesteps[i]) + "," + str(error_price_allruns[i])  + "," + str(error_quality_allruns[i]) + "," + str(error_QP_allruns[i]) + "," + str(error_trust_allruns[i]) + "\n"
     
     # graph QP for all runs
     plt.errorbar(timesteps, mean_QP_allruns, yerr = error_QP_allruns, fmt= 'k.', capsize=2)
@@ -580,6 +579,14 @@ def retailer_mean_plotter(retailer_mean_data):
     plt.ylabel("Price")
     plt.savefig("RetailerData/Overall_Price.png")
     plt.clf()
+    
+    # open output file to write mean values into
+    dirpath = os.getcwd()
+    foldername = os.path.basename(dirpath)
+    with open("RetailerData/" + foldername, "w") as meanfile:
+        meanfile.write(meanstring)
+    with open("RetailerData/" + foldername + "Errors","w") as errorfile:
+        errorsfile.write(errorstring)
     
 
 ## read command line

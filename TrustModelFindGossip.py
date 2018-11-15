@@ -398,7 +398,7 @@ for gossip_weight in weights:
         os.mkdir(str(gossip_weight))
         
         ## Write to files
-        pfilenames = ["PatientQualities.csv", "PatientPrices.csv"]
+        pfilenames = ["PatientPrices.csv", "PatientQualities.csv"]
         rfilenames = ["RetailerPrices.csv", "RetailerQualities.csv", "RetailerInventories.csv", "TrustInRetailers.csv", "PRInteractionCounts.csv"]
         sfilenames = ["SupplierPrices.csv", "SupplierQualities.csv", "SupplierInventories.csv", "TrustInSuppliers.csv", "RSInteractionCounts.csv"]
         
@@ -473,11 +473,19 @@ for gossip_weight in weights:
                 
             ## Initialise values
             
+        
+            # Interaction count arrays
+            patient_retailer_interaction_count = np.zeros((number_patients,number_retailers))
+            retailer_supplier_interaction_count = np.zeros((number_retailers,number_suppliers))
+                
+            
             # patients initially have neutral trust for each retailer
             patient_retailer_trust.fill(0.5)
 
             # retailers initially have neutral trust for each supplier
             retailer_supplier_trust.fill(0.5)
+            
+            
             
             # suppliers initial values
             supplier_inventory.fill(int(number_patients/number_suppliers))
@@ -602,7 +610,7 @@ for gossip_weight in weights:
                     while retailer_inventory[chosen_retailer] < 1:
                         retailer_values = np.delete(retailer_values, chosen_retailer_row,0)
                         try:
-                            chosen_retailer_row = np.argmax(retailer_values[:,1])/home/s1457132/Documents/EvolutionOfTrustInMedecine/findGossip/simplotter.py
+                            chosen_retailer_row = np.argmax(retailer_values[:,1])
                             chosen_retailer = int(retailer_values[chosen_retailer_row,0])
                         except ValueError:
                             print("None of the retailers have enough stock.")
@@ -749,7 +757,7 @@ for gossip_weight in weights:
             os.mkdir(str(gossip_mode) + str(gossip_weight))
             
             ## Write to files
-            pfilenames = ["PatientPrices.csv", "PatientQualities.csv"]
+            pfilenames = ["PatientPrices.csv","PatientQualities.csv"]
             rfilenames = ["RetailerPrices.csv", "RetailerQualities.csv", "RetailerInventories.csv", "TrustInRetailers.csv", "PRInteractionCounts.csv"]
             sfilenames = ["SupplierPrices.csv", "SupplierQualities.csv", "SupplierInventories.csv", "TrustInSuppliers.csv", "RSInteractionCounts.csv"]
             
