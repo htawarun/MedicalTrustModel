@@ -14,7 +14,7 @@ Simple model describing the evolution of trust in medicine, based on previous wo
 ## Input files
 - standard_input : input for TrustModel.py, see file for formatting
 - findgossip_input : input for TrustModelFindGossip.py, see file for formatting
-- test_input : input for TrustModel.py, less retailers, patients and suppliers, runs and timesteps as only for testing purposes.
+
 ## Plotting Scripts
 - QvsGplotter.py : plots Quality vs Gossip weight with data files produced by simplotter.py, requires file names as command line input
 - allplotter.py : plots average Quality, Price and Quality/Price over time with data files produced by simplotter.py, requires file names as command line input
