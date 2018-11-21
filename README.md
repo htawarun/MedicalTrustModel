@@ -2,29 +2,27 @@
 
 Cara Lynch
 
-Created October 2018, last modified 11/11/2018 17:26
+Created October 2018, last modified 21/11/2018 16:06
 
 ## Overview
-Simple model describing the evolution of trust in medicine, based on previous work by Graeme Ackland, incorporating two gossip modes.
+Simple agent-based model (ABM) of a self-organising pharmaceutical supply chain with variable drug quality, based on previous work by Graeme Ackland. This model incorporates two gossip modes, public and friendly.
 
-## Models
-- TrustModel.py: Standard model, with different gossip and trust modes.
-- TrustModelFindGossip.py: Modified model, running simulations for one set of retailers and suppliers while iterating over gossip values. Aims to assess the effects of gossip on quality and price.
+## Model scripts
+- TrustModel.py: standard python script to run the ABM, requires an input file name as a command line argument. The input file must be in standard_input format.
 
-## Input files
+
+- TrustModelFindGossip.py: modified model written to specifically assess the effects of gossip on the system. No input file required, this script runs simulations for one set of retailers and suppliers while changing gossip and trust values. To perform more than one run, qsubrungossmodels.bash and Gsinglesub are required.
+
+## Input file
 - standard_input : input for TrustModel.py, see file for formatting
-- findgossip_input : input for TrustModelFindGossip.py, see file for formatting
 
-## Plotting Scripts
-- QvsGplotter.py : plots Quality vs Gossip weight with data files produced by simplotter.py, requires file names as command line input
-- allplotter.py : plots average Quality, Price and Quality/Price over time with data files produced by simplotter.py, requires file names as command line input
-- findgossgrapher.py : plots Quality Improvement = Q(gossip weight)/Q(no gossip) and Price Improvement = P(gossip weight)/P(no gossip) vs gossip weight, for all TrustModelFindGossip.py runs in directory. Also plots Quality and Price vs Gossip Weight for each run.
-- simplotter.py : plots quality, price and quality/price vs gossip weight for all runs and averaged over all runs
+## Plotting Script
+- grapher.py : plots data from TrustModelFindGossip.py runs, designed to be in parent directory (where qsubrungossmodels.bash is, with Run1 as subdirectory).
+
 ## Other scripts
-- directories.py : makes directories with required input files
-- qsubrungossmodels.bash : queues all jobs in directory to local cluster for a TrustModelFindGossip.py simulation. Requires subdirectories with input files, singlesub (appropriately modified), and TrustModelFindGossip.py in directory
-- qsubrunmodels.bash : same as above, but for standard TrustModel.py jobs
-- runmodels.bash : runs all jobs in directory on local machine
-- singlesub : single submission to local cluste, must be in relevant subdirectory
+- qsubrungossmodels.bash : makes a directory for the number of runs specified (usually 100), copies TrustModelFindGossip.py and Gsinglesub into each directory and queues all jobs to the local cluster. Requires Gsinglesub and TrustModelFindGossip.py in directory.
+- qsubrunmodels.bash : copies and queues all TrustModel.py jobs in subdirectories. Requires subdirectories and standard_input files in each subdirectory, as well as TrustModel.py in directory. Low number of runs in TrustModel.py is recommended to have time to finish, as each run will be running consecutively rather than me sent as different jobs to different cores.
+- runmodels.bash : copies TrustModel.py into each subdirectory and launches in background on local machine. Requires TrustModel.py in directory and standard_input files in subdirectories
+- singlesub and Gsinglesub: single submission scripts to local cluster, must be in relevant subdirectory. singlesub is for TrustModel.py jobs while Gsinglesub is for TrustModelFindGossip.py jobs.
 
 
