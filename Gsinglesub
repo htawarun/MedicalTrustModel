@@ -5,13 +5,13 @@
 #$ -S /bin/bash
 
 # 2. Request one hour of wallclock time (format hours:minutes:seconds).
-#$ -l h_rt=15:00:00
+#$ -l h_rt=20:00:00
 
 # 5. Set the name of the job.
-#$ -N trust
+#$ -N bigtrust
 
 #$ -cwd
 
 #$ -pe mpi 1
 
-python TrustModel.py standard_input
+python TrustModelFindGossip.py standard_input
