@@ -2,7 +2,7 @@
 
 Cara Lynch
 
-Created October 2018, last modified 21/11/2018 16:06
+Created October 2018, last modified 24/11/2018 18:40
 
 ## Overview
 Simple agent-based model (ABM) of a self-organising pharmaceutical supply chain with variable drug quality, based on previous work by Graeme Ackland. This model incorporates two gossip modes, public and friendly.
