@@ -16,8 +16,9 @@ Simple agent-based model (ABM) of a self-organising pharmaceutical supply chain 
 ## Input file
 - standard_input : input for TrustModel.py, see file for formatting
 
-## Plotting Script
+## Plotting scripts
 - grapher.py : plots data from TrustModelFindGossip.py runs, designed to be in parent directory (where qsubrungossmodels.bash is, with Run1 as subdirectory).
+- simplotter.py: plots data from TrustModel.py, designed to be in directory where TrustModel.py ran.
 
 ## Other scripts
 - qsubrungossmodels.bash : makes a directory for the number of runs specified (usually 100), copies TrustModelFindGossip.py and Gsinglesub into each directory and queues all jobs to the local cluster. Requires Gsinglesub and TrustModelFindGossip.py in directory.
