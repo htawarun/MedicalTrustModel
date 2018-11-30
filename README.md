@@ -43,8 +43,7 @@ Different graphs:
 - Qvstime.png: Average quality of medicine bought by patients over 200 runs, with all modes shown.
 - QEndvstime2.png: The above plot without the price mode, only over the last 200 timesteps.
 - Qvstimefit.png: An attempt to fit Qvstime for T, Gf and Gp, with a fit A-Bexp(x/C) with A, B and C fitted parameters.
-- Qdiff.png: graph of Qmax-Q over time with Qmax set as the maximum average value of quality of medicine bought by patients (the value at timestep 400) and Q the average value of quality of medicine.
-- Qdifffits.png: attempt to fit the above graph with A-Bexp(x/C).
-- Qdifflog.png: Qdiff.png plot with a log scale on the y axis.
+- Qdiff.png: graph of average Qmax-Q over time with Qmax set as the maximum value of quality of medicine bought by patients (usually the value at timestep 400) and Q the quality of medicine, averaged over 200 runs.
 - Qdiffzoom.png: Qdiff.png plot over the last 200 timesteps.
 - Pvstime.png: Average price of medicine bought by patients over 200 runs, with all modes shown.
+- RunX.png: Q vs time step for a few random runs from the 200 performed, with X the run number.
